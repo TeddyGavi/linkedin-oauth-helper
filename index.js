@@ -37,7 +37,10 @@ async function checkIfThereIsAValidAccessToken() {
             const {linkedInAccessToken} = JSON.parse(data);
             if (linkedInAccessToken) {
                 const linkedInUserId = await API.getLinkedinId(linkedInAccessToken);
-                return {linkedInUserId, linkedInAccessToken};
+                console.log('now posting...')
+                const posting = await API.ugcPost(linkedInAccessToken, linkedInUserId.sub)
+                console.log(posting)
+                return {linkedInUserId, linkedInAccessToken, posting};
             }
             return false;
         }
@@ -66,7 +69,7 @@ async function handleCallback(req, res) {
         const linkedInId = await API.getLinkedinId(linkedInAccessToken);
         const result = {linkedInId, linkedInAccessToken};
         console.log(result);
-        const htmlResult = `<html><head><style>td {border: 1px solid;}</style></head><div>Your can now close this window. :-) <br><table><tr><td>linkedInId</td><td>linkedInAccessToken</td></tr><tr><td>${result.linkedInId}</td><td>${result.linkedInAccessToken}</td></tr></table></div>`;
+        const htmlResult = `<html><head><style>td {border: 1px solid;}</style></head><div>Your can now close this window. :-) <br><table><tr><td>linkedInId</td><td>linkedInAccessToken</td></tr><tr><td>${linkedInId.sub}</td><td>${result.linkedInAccessToken}</td></tr></table></div>`;
         res.send(htmlResult);
     } catch (err) {
         res.json(err);
