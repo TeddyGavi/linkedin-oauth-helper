@@ -31,7 +31,7 @@ class API {
                 if (err || response.statusCode !== 200) {
                     return reject(err || JSON.parse(body));
                 }
-                resolve(JSON.parse(body).id);
+                resolve(JSON.parse(body).sub);
             });
         });
     }
