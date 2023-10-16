@@ -16,14 +16,13 @@ assert(redirectURI, 'redirectURI is required');
 assert(accessTokenURL, 'accessTokenURL is required');
 
 redirectURI = redirectURI.replace('{__PORT__}', process.env.PORT || 3000);
-
 class API {
 
     static getLinkedinId(access_token) {
         return new Promise((resolve, reject) => {
-            const url = 'https://api.linkedin.com/v2/me';
+            const url = 'https://api.linkedin.com/v2/userinfo';
             const headers = {
-                'Authorization': 'Bearer ' + access_token,
+                'Authorization': `Bearer ${access_token}`,
                 'cache-control': 'no-cache',
                 'X-Restli-Protocol-Version': '2.0.0'
             };
@@ -45,8 +44,11 @@ class API {
             client_id: clientId,
             client_secret: clientSecret
         };
+        const headers = {
+            'Content-type':'application/x-www-form-urlencoded'
+        }
         return new Promise((resolve, reject) => {
-            request.post({url: accessTokenURL, form: body}, (err, response, body) => {
+            request.post({url: accessTokenURL, form: body, headers: headers}, (err, response, body) => {
                     if (err || response.statusCode !== 200) {
                         return reject(err || JSON.parse(body));
                     }
@@ -58,7 +60,7 @@ class API {
 
     static getAuthorizationUrl() {
         const state = Buffer.from(Math.round(Math.random() * Date.now()).toString()).toString('hex');
-        const scope = encodeURIComponent('r_liteprofile r_emailaddress w_member_social');
+        const scope = encodeURIComponent('profile openid email w_member_social');
         return `${authorizationURL}?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectURI)}&state=${state}&scope=${scope}`;
     }
 }
